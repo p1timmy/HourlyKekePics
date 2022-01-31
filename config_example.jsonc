@@ -1,0 +1,16 @@
+/* Configuration file template
+
+   All keys below are REQUIRED. You must copy this file as config.json and
+   remove all comments before starting the bot.
+   (Python's json library throws errors when it attempts to parse comments) */
+{
+    /* Put your bot's API consumer keys below (found in your Twitter app's
+       settings at https://developer.twitter.com/en/portal/projects-and-apps),
+       then run the bot to get your access keys */
+    "twitter_keys":{
+        "consumer":"",
+        "consumer_secret":"",
+        "access":"",
+        "access_secret":""
+    }
+}
