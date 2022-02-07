@@ -7,7 +7,7 @@ Source code of the [Hourly Keke Pics Twitter bot](https://twitter.com/HourlyKeke
 ## Requirements
 
 - Python 3.10 or later
-- [`schedule`](https://pypi.python.org/pypi/schedule) and [`tweepy`](https://pypi.python.org/pypi/tweepy) libraries, run `pip install -r requirements.txt` to install them automatically.
+- [`schedule`](https://pypi.python.org/pypi/schedule) and [`tweepy`](https://pypi.python.org/pypi/tweepy) libraries (run `pip install -r requirements.txt` to install them automatically)
 
 ## Setup and usage
 
@@ -21,7 +21,7 @@ To exit out of the bot, just press <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 
 ## Special thanks to&hellip;
 
-- [@iqqydesu](https://twitter.com/iqqydesu) for coming up with the idea for this bot and providing some 200+ pics of Keke Tang, this bot wouldn't exist without their support!
+- [@iqqydesu](https://twitter.com/iqqydesu) for coming up with the idea for this bot and providing some 200+ pics of [Keke Tang](https://love-live.fandom.com/wiki/Keke_Tang), this bot wouldn't exist without their support!
 
 ---
 
