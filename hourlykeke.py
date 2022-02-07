@@ -58,10 +58,12 @@ class TwitterClient():
         )
         if keys["access"] == "" and keys["access_secret"] == "":
             print(
-                "Open the following link in your browser:\n"
+                "\nOpen the following link in your browser:\n"
                 f"{auth.get_authorization_url()}"
             )
-            pin = input("and enter the PIN that appears on the page: ").strip()
+            pin = input("and enter the PIN on that page: ").strip()
+            while len(pin) != 6 and not pin.isdigit():
+                pin = input("Invalid input, enter PIN: ").strip()
             keys["access"], keys["access_secret"] = auth.get_access_token(pin)
             print(
                 "Here are your access token and secret keys:\n"
