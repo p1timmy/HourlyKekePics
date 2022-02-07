@@ -13,16 +13,15 @@ import tweepy
 
 __version__ = "1.0.0"
 LOG_LEVEL = logging.DEBUG
+# Same pic can't be sent more than once within this many hours
 RECENTS_COUNT = 12
+LOG_FMT = "%(levelname)s (%(name)s): %(message)s"
 
 # File and directory names
 CONFIG_FILE = "config.json"
 IMG_DIR = "img"
 LOGFILE = "bot.log"
 RECENTS_LIST_FILE = "recentpics.txt"
-
-# Templates
-LOG_FMT = "%(levelname)s (%(name)s): %(message)s"
 
 logger = logging.getLogger(__name__)
 config_dict = {}
@@ -87,11 +86,9 @@ class TwitterClient():
             raise
 
     def send_tweet(self, media_path: str, tweet=""):
-        # Return response data if tweet was sent successfully, otherwise False
         try:
             logger.debug("Uploading %s", media_path)
             media_id = self._api.media_upload(media_path).media_id_string
-
             logger.debug("Sending tweet")
             response = self._api.update_status(status=tweet, media_ids=[media_id])
             return response
@@ -102,7 +99,6 @@ class TwitterClient():
             return self.send_tweet(media_path, tweet)
         except tweepy.TweepyException:
             logger.exception("Failed to send tweet")
-        return False
 
 
 image_queue = ImageQueue()
@@ -123,7 +119,7 @@ def verify_keys():
             f'Required key "{k}" not found in config file'
         assert isinstance(keys[k], str), \
             f'Required key "{k}" must have value of type string '
-        if "consumer" in k:
+        if k.startswith("consumer"):
             assert keys[k] != "", f'Required key "{k}" can\'t be blank'
 
 
@@ -139,7 +135,7 @@ def populate_queue():
             continue
         image_queue.enqueue(f"{IMG_DIR}/{filename}")
         counter += 1
-    logger.info(f"Added {counter} images to queue")
+    logger.info(f"Added {counter} image{'s' if counter != 1 else ''} to queue")
 
 
 def tweet_image(bot: TwitterClient):
@@ -152,7 +148,7 @@ def tweet_image(bot: TwitterClient):
     while not os.path.isfile(filename):
         filename = image_queue.dequeue()
 
-    # Step 3: Send tweet and add post ID to recent IDs list
+    # Step 3: Send tweet and add filename to recents list
     response = bot.send_tweet(filename)
     if response:
         logger.info(
@@ -233,9 +229,10 @@ def main(minute: int = 5):
     if current_min == minute:
         tweet_image(bot)
     schedule.every().hour.at(f":{minute:02d}").do(tweet_image, bot)
+    next_run = schedule.next_run().strftime('%H:%M:%S')
     logger.info(
         f"Schedule set to {minute} minute{'s' if minute != 1 else ''} "
-        "past the hour"
+        f"past the hour, next tweet to be sent at {next_run}"
     )
 
     while True:
