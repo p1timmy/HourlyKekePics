@@ -97,8 +97,8 @@ class TwitterClient():
             return response
         except socket.gaierror:
             # Retry if tweet didn't send due to network-related issues
-            logger.error("Failed to send tweet, retrying in 60 seconds")
-            time.sleep(60)
+            logger.error("Failed to send tweet, retrying in 30 seconds")
+            time.sleep(30)
             return self.send_tweet(media_path, tweet)
         except tweepy.TweepyException:
             logger.exception("Failed to send tweet")
@@ -250,7 +250,7 @@ if __name__ == "__main__":
     try:
         load_recent_pics()
         parse_config()
-        main(16)
+        main(5)
     except (KeyboardInterrupt, SystemExit):
         # Use Ctrl-C to terminate the bot
         logger.info("Shutting down...")
