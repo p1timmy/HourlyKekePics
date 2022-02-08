@@ -12,7 +12,8 @@ import schedule
 import tweepy
 
 __version__ = "1.0.0"
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO
+LOGFILE_LEVEL = logging.DEBUG
 # Same pic can't be sent more than once within this many hours
 RECENTS_COUNT = 12
 LOG_FMT = "%(levelname)s (%(name)s): %(message)s"
@@ -167,14 +168,22 @@ def tweet_image(bot: TwitterClient):
 
 
 def set_up_logging():
-    logging.basicConfig(format=LOG_FMT, level=LOG_LEVEL)
+    logger.setLevel(LOGFILE_LEVEL)
     logging.Formatter.converter = time.gmtime
-
-    filehandler = logging.FileHandler(LOGFILE)
     fmt = logging.Formatter("[%(asctime)s] " + LOG_FMT, "%Y-%m-%dT%H:%M:%SZ")
-    filehandler.setFormatter(fmt)
-    logging.getLogger().addHandler(filehandler)
 
+    # Create console handler
+    clihandler = logging.StreamHandler()
+    clihandler.setLevel(LOG_LEVEL)
+    clihandler.setFormatter(fmt)
+    logger.addHandler(clihandler)
+
+    # Create file handler
+    filehandler = logging.FileHandler(LOGFILE)
+    filehandler.setFormatter(fmt)
+    logger.addHandler(filehandler)
+
+    # Silence info/debug logs from libraries
     logging.getLogger("oauthlib").setLevel(logging.WARNING)
     logging.getLogger("requests").setLevel(logging.WARNING)
     logging.getLogger("requests_oauthlib").setLevel(logging.WARNING)
