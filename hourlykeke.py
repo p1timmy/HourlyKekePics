@@ -47,7 +47,9 @@ class ImageQueue():
         return self.__len__() < 1
 
     def first(self) -> str:
-        return self._items[-1] if self._items else None
+        if not len(self._items):
+            raise IndexError("queue is empty")
+        return self._items[-1]
 
 
 class TwitterClient():
