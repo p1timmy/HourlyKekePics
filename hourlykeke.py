@@ -11,7 +11,7 @@ from collections import deque
 import schedule
 import tweepy
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 LOG_LEVEL = logging.INFO
 LOGFILE_LEVEL = logging.DEBUG
 # Same pic can't be sent more than once within this many hours
@@ -30,27 +30,27 @@ config_dict = {}
 
 class ImageQueue():
     def __init__(self):
-        self._items = []
+        self.items = []
 
     def enqueue(self, filename: str):
-        self._items.insert(0, filename)
+        self.items.insert(0, filename)
 
     def dequeue(self) -> str:
-        return self._items.pop()
+        return self.items.pop()
 
     def __len__(self):
-        return self._items.__len__()
+        return self.items.__len__()
 
     def __str__(self):
-        return self._items.__str__()
+        return self.items.__str__()
 
     def is_empty(self) -> bool:
         return self.__len__() < 1
 
     def first(self) -> str:
-        if not len(self._items):
+        if not len(self.items):
             raise IndexError("queue is empty")
-        return self._items[-1]
+        return self.items[-1]
 
 
 class TwitterClient():
@@ -125,12 +125,12 @@ def verify_keys():
 def populate_queue():
     files = os.listdir(IMG_DIR)
     counter = 0
-    while len(image_queue) < (RECENTS_COUNT):
+    while len(image_queue) < RECENTS_COUNT:
         filename = random.choice(files)
         ext = filename.split(".", -1)[-1]
         if ext.lower() not in ("jpg", "jpeg", "png", "gif"):
             continue
-        if filename in recent_files:
+        if filename in recent_files or filename in image_queue.items:
             continue
         image_queue.enqueue(f"{IMG_DIR}/{filename}")
         counter += 1
