@@ -2,16 +2,16 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Source code of the [Hourly Keke Pics Twitter bot](https://twitter.com/HourlyKekePics) written in Python.
+Source code of the [Hourly Keke Pics Twitter bot](https://twitter.com/HourlyKekeBot) written in Python.
 
 ## Requirements
 
-- Python 3.10 or later
+- Python 3.7 or later (latest version of Python 3 recommended)
 - [`schedule`](https://pypi.python.org/pypi/schedule) and [`tweepy`](https://pypi.python.org/pypi/tweepy) libraries (run `pip install -r requirements.txt` to install them automatically)
 
 ## Setup and usage
 
-Before running the bot, copy [`config_example.json`](./config_example.json) as `config.json`, then enter your API consumer keys as shown in your Twitter app's settings.
+Before running the bot, copy [`config_example.jsonc`](./config_example.jsonc) to a separate file named `config.json`, then enter your API consumer keys as shown in [your Twitter app's settings](https://developer.twitter.com/en/portal/projects-and-apps).
 
 To start, run `python hourlykeke.py`.
 
