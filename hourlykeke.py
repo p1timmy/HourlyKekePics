@@ -76,14 +76,10 @@ class TwitterClient():
         self._authenticate()
 
     def _authenticate(self):
-        try:
-            self.user = self._api.verify_credentials().screen_name
-            logger.info(
-                "Twitter API keys verified, authenticated as @%s",
-                self.user)
-        except tweepy.TweepyException:
-            logger.exception("Could not verify Twitter API keys")
-            raise
+        self.user = self._api.verify_credentials().screen_name
+        logger.info(
+            "Twitter API keys verified, authenticated as @%s",
+            self.user)
 
     def send_tweet(self, media_path: str, tweet=""):
         try:
