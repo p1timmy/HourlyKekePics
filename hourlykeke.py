@@ -11,7 +11,7 @@ from collections import deque
 import schedule
 import tweepy
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 LOG_LEVEL = logging.INFO
 LOGFILE_LEVEL = logging.DEBUG
 # Same pic can't be sent more than once within this many hours
@@ -75,6 +75,7 @@ class TwitterClient():
             )
             input()
         auth.set_access_token(keys["access"], keys["access_secret"])
+
         self._api = tweepy.API(auth)
         self._authenticate()
 
@@ -137,26 +138,28 @@ def populate_queue():
     logger.info(f"Added {counter} image{'s' if counter != 1 else ''} to queue")
 
 
-def tweet_image(bot: TwitterClient):
+def tweet_image(bot: TwitterClient, no_delay: bool = False):
     # Step 1: Repopulate queue if empty
     if len(image_queue) < 1:
         populate_queue()
 
-    # Step 2: Get the next image on front of queue
+    # Step 2: Pull out next image on front of queue
     filename = image_queue.dequeue()
     while not os.path.isfile(filename):
         filename = image_queue.dequeue()
 
     # Step 3: Send tweet and add filename to recents list
+    if not no_delay:
+        time.sleep(random.randrange(1, 30))
+
     response = bot.send_tweet(filename)
     if response:
         logger.info(
             "Tweet sent, view it at "
             f"https://twitter.com/{bot.user}/status/{response.id}"
         )
-
-        # Discard filename from queue when done
-        logger.debug(f"{len(image_queue)} images remaining in queue")
+        q_len = len(image_queue)
+        logger.debug(f"{q_len} image{'s' if q_len != 1 else ''} remaining in queue")
 
         # Save recent images file
         recent_files.append(filename)
@@ -202,7 +205,8 @@ def load_recent_pics():
         count = 0
         for line in f:
             line = line.strip("\n")
-            recent_files.append(line)
+            if line:
+                recent_files.append(line)
             count += 1
         logger.debug(
             f"Found {count} filename{'s' if count != 1 else ''} in recents file"
@@ -212,7 +216,7 @@ def load_recent_pics():
 
 def save_recent_filenames():
     with open(RECENTS_LIST_FILE, mode="w") as f:
-        f.write("\n".join(recent_files))
+        f.write("\n".join(recent_files) + "\n")
     logger.debug(
         f"Saved last {RECENTS_COUNT} image filenames to {RECENTS_LIST_FILE}"
     )
@@ -230,18 +234,20 @@ def main(minute: int = 5):
     # Set up Twitter API client
     bot = TwitterClient(config_dict["twitter_keys"])
 
-    # Build initial queue, then set up schedule
-    # Post immediately if current UTC minute is equal to target minute
-    current_min = time.gmtime().tm_min
+    # Post immediately if current minute is equal to target minute
+    current_min = time.localtime().tm_min
     if current_min == minute:
-        tweet_image(bot)
-    schedule.every().hour.at(f":{minute:02d}").do(tweet_image, bot)
+        tweet_image(bot, True)
+
+    # Set up schedule
+    schedule.every().hour.at(f":{minute:02d}").do(tweet_image, bot, False)
     next_run = schedule.next_run().strftime('%H:%M:%S')
     logger.info(
         f"Schedule set to {minute} minute{'s' if minute != 1 else ''} "
         f"past the hour, next tweet to be sent at {next_run}"
     )
 
+    # Main loop
     while True:
         schedule.run_pending()
         time.sleep(1)
