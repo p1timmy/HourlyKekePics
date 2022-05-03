@@ -11,7 +11,7 @@ from collections import deque
 import schedule
 import tweepy
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 LOG_LEVEL = logging.INFO
 LOGFILE_LEVEL = logging.DEBUG
 # Same pic can't be sent more than once within this many hours
@@ -131,9 +131,10 @@ def populate_queue():
         ext = filename.split(".", -1)[-1]
         if ext.lower() not in ("jpg", "jpeg", "png", "gif"):
             continue
-        if filename in recent_files or filename in image_queue.items:
+        path = f"{IMG_DIR}/{filename}"
+        if path in recent_files or path in image_queue.items:
             continue
-        image_queue.enqueue(f"{IMG_DIR}/{filename}")
+        image_queue.enqueue(path)
         counter += 1
     logger.info(f"Added {counter} image{'s' if counter != 1 else ''} to queue")
 
@@ -218,7 +219,7 @@ def save_recent_filenames():
     with open(RECENTS_LIST_FILE, mode="w") as f:
         f.write("\n".join(recent_files) + "\n")
     logger.debug(
-        f"Saved last {RECENTS_COUNT} image filenames to {RECENTS_LIST_FILE}"
+        f"Saved paths of last {RECENTS_COUNT} images to {RECENTS_LIST_FILE}"
     )
 
 
